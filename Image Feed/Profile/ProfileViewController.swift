@@ -7,7 +7,7 @@ final class ProfileViewController: UIViewController {
         imageView.image = UIImage(named: "avatar")
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 36 // половина от width/height (72/2)
+        imageView.layer.cornerRadius = 35
         return imageView
     }()
 
@@ -15,7 +15,7 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.text = "Екатерина Новикова"
         label.textColor = .white
-        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.font = UIFont.boldSystemFont(ofSize: 23)
         return label
     }()
 
@@ -23,7 +23,7 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.text = "@ekaterina_nov"
         label.textColor = .gray
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
 
@@ -31,7 +31,7 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.text = "Hello, world!"
         label.textColor = .white
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.systemFont(ofSize: 13)
         return label
     }()
 
@@ -39,14 +39,14 @@ final class ProfileViewController: UIViewController {
         let button = UIButton(type: .system)
         let image = UIImage(systemName: "rectangle.portrait.and.arrow.forward")
         button.setImage(image, for: .normal)
-        button.tintColor = .red
+        button.tintColor = UIColor(named: "ypRed")
         button.addTarget(self, action: #selector(didTapLogoutButton), for: .touchUpInside)
         return button
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
+        view.backgroundColor = UIColor(named: "ypBlack")
 
         [avatarImageView, nameLabel, loginNameLabel, descriptionLabel, logoutButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -58,33 +58,38 @@ final class ProfileViewController: UIViewController {
 
     @objc private func didTapLogoutButton() {
         print("Logout tapped")
-        // Добавь логику выхода
     }
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // Logout button — по правому верхнему углу
-            logoutButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            logoutButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            // Avatar
+            avatarImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32),
+            avatarImageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            avatarImageView.widthAnchor.constraint(equalToConstant: 70),
+            avatarImageView.heightAnchor.constraint(equalToConstant: 70),
 
-            // Avatar — по левому краю
-            avatarImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
-            avatarImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            avatarImageView.widthAnchor.constraint(equalToConstant: 72),
-            avatarImageView.heightAnchor.constraint(equalToConstant: 72),
+            // Name
+            nameLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: 8),
+            nameLabel.leadingAnchor.constraint(equalTo: avatarImageView.leadingAnchor),
 
-            // Name — под аватаром, по левому краю
-            nameLabel.topAnchor.constraint(equalTo: avatarImageView.bottomAnchor, constant: 16),
-            nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            // Login name
+            loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            loginNameLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            loginNameLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
 
-            // Login name — под именем, по левому краю
-            loginNameLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4),
-            loginNameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-
-            // Description — под логином, по левому краю
+            // Description
             descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: 8),
-            descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            descriptionLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            descriptionLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
+
+            // Logout button
+            logoutButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 55),
+            logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            logoutButton.widthAnchor.constraint(equalToConstant: 44),
+            logoutButton.heightAnchor.constraint(equalToConstant: 44),
+            logoutButton.leadingAnchor.constraint(greaterThanOrEqualTo: avatarImageView.trailingAnchor, constant: 8),
         ])
     }
+
 
 }
