@@ -6,12 +6,18 @@
       "scale" : "1x"
     },
     {
+<<<<<<< HEAD
       "filename" : "Vector@2x.png",
+=======
+>>>>>>> Sprint-9-Upd
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+<<<<<<< HEAD
       "filename" : "Vector@3x.png",
+=======
+>>>>>>> Sprint-9-Upd
       "idiom" : "universal",
       "scale" : "3x"
     }
