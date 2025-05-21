@@ -23,22 +23,22 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        vc.dismiss(animated: true) // Закрываем WebView
+        vc.dismiss(animated: true)
 
-        oauth2Service.fetchOAuthToken(code) { [weak self] (result: Result<String, Error>) in
+        oauth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
 
             switch result {
             case .success:
-                self.delegate?.authViewController(self, didAuthenticateWithCode: code)  // исправлено здесь
+                self.delegate?.authViewController(self, didAuthenticateWithCode: code)
             case .failure(let error):
-                print("Failed to fetch OAuth token: \(error.localizedDescription)")
+                print("Authorization error: \(error.localizedDescription)")
+                // Ошибка — остаёмся на AuthViewController
             }
         }
     }
-    
+
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         dismiss(animated: true)
     }
 }
-

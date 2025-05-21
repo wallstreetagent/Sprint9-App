@@ -1,5 +1,14 @@
 import Foundation
 
 final class OAuth2TokenStorage {
-    var token: String? // TODO [Sprint 10]
+    private let tokenKey = "OAuthToken"
+
+    var token: String? {
+        get {
+            UserDefaults.standard.string(forKey: tokenKey)
+        }
+        set {
+            UserDefaults.standard.setValue(newValue, forKey: tokenKey)
+        }
+    }
 }
