@@ -15,9 +15,11 @@ struct OAuthTokenResponseBody: Decodable {
 }
 
 final class OAuth2Service {
+    static let shared = OAuth2Service()
     private let tokenStorage = OAuth2TokenStorage()
     private var task: URLSessionTask?
-
+  
+    
     func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
         task?.cancel()
         
