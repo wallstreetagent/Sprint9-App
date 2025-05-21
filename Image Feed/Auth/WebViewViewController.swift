@@ -16,24 +16,32 @@ final class WebViewViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         webView.navigationDelegate = self
 
-        var urlComponents = URLComponents(string: UnsplashAuthorizeURLString)!
+        guard var urlComponents = URLComponents(string: UnsplashAuthorizeURLString) else {
+            print("❌ Failed to create URLComponents from: \(UnsplashAuthorizeURLString)")
+            return
+        }
+
         urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: Constants.AccessKey),
-            URLQueryItem(name: "redirect_uri", value: Constants.RedirectURI),
+            URLQueryItem(name: "client_id", value: Constants.accessKey),
+            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: Constants.AccessScope)
+            URLQueryItem(name: "scope", value: Constants.accessScope)
         ]
 
-        let url = urlComponents.url!
+        guard let url = urlComponents.url else {
+            print("❌ Failed to create URL from components: \(urlComponents)")
+            return
+        }
 
         let request = URLRequest(url: url)
         webView.load(request)
 
         updateProgress()
     }
+
 
     @IBAction private func didTapBackButton(_ sender: Any?) {
         delegate?.webViewViewControllerDidCancel(self)
