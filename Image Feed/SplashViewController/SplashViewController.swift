@@ -1,5 +1,5 @@
 import UIKit
-
+    //
 final class SplashViewController: UIViewController {
     private let profileService = ProfileService.shared
     private let oauth2Service = OAuth2Service()
