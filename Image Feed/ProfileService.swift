@@ -43,9 +43,12 @@ final class ProfileService {
     }
 
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
+        print("📡 fetchProfile вызван с токеном: \(token)") // ✅ Добавлено
+
         task?.cancel()
 
         guard let request = makeProfileRequest(token: token) else {
+            print("❌ Не удалось создать запрос профиля")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
@@ -53,9 +56,13 @@ final class ProfileService {
         task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             defer { self?.task = nil }
 
-            if let error = error as NSError?, error.code == NSURLErrorCancelled { return }
+            if let error = error as NSError?, error.code == NSURLErrorCancelled {
+                print("⚠️ Запрос отменён")
+                return
+            }
 
             if let error = error {
+                print("❌ Ошибка запроса профиля: \(error)")
                 completion(.failure(error))
                 return
             }
@@ -65,6 +72,7 @@ final class ProfileService {
                 (200...299).contains(httpResponse.statusCode),
                 let data = data
             else {
+                print("❌ Неверный ответ от сервера")
                 completion(.failure(NetworkError.invalidResponse))
                 return
             }
@@ -83,14 +91,17 @@ final class ProfileService {
                 )
 
                 self?.profile = profile
+                print("✅ Профиль успешно получен: \(profile)") // ✅ Добавлено
                 completion(.success(profile))
             } catch {
+                print("❌ Ошибка декодирования профиля: \(error)") // ✅ Добавлено
                 completion(.failure(error))
             }
         }
 
         task?.resume()
     }
+
 }
 
 

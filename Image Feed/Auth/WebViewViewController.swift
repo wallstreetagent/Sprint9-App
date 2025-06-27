@@ -86,7 +86,9 @@ extension WebViewViewController: WKNavigationDelegate {
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
         if let code = code(from: navigationAction) {
-            UIBlockingProgressHUD.show() 
+            print("Получен код \(code)")
+            UIBlockingProgressHUD.show()
+            print("Получен код авторизации: \(code)")
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
             decisionHandler(.cancel)
         } else {

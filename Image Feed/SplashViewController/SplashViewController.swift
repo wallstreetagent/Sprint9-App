@@ -83,41 +83,48 @@ extension SplashViewController: AuthViewControllerDelegate {
         alert.addAction(UIAlertAction(title: "Ок", style: .default))
         self.present(alert, animated: true)
     }
-
-
+    
+    
     private func fetchOAuthToken(_ code: String) {
-        UIBlockingProgressHUD.show() // ⬅️ Показываем HUD сразу
-
+        print("🚀 Старт получения токена")
+        UIBlockingProgressHUD.show()
+        
         oauth2Service.fetchOAuthToken(code) { [weak self] (result: Result<String, Error>) in
             guard let self = self else { return }
-
+            
             switch result {
             case .success(let token):
+                print("✅ Токен получен: \(token)")
+                print("👉 fetchOAuthToken завершён, вызываем fetchProfile с токеном: \(token)")
                 profileService.fetchProfile(token) { result in
                     switch result {
                     case .success(let profile):
+                        print("👤 Профиль получен: \(profile)")
                         ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { _ in }
                         DispatchQueue.main.async {
-                            UIBlockingProgressHUD.dismiss() // ⬅️ Скрываем HUD
+                            print("➡️ Переход на TabBarController (успех)")
+                            UIBlockingProgressHUD.dismiss()
                             self.switchToTabBarController()
                         }
+                        
                     case .failure(let error):
                         print("❌ Не удалось загрузить профиль: \(error)")
                         DispatchQueue.main.async {
-                            UIBlockingProgressHUD.dismiss() // ⬅️ Обязательно скрыть
-                            self.switchToTabBarController() // ⬅️ Переходим даже при ошибке
+                            print("➡️ Переход на TabBarController (ошибка профиля)")
+                            UIBlockingProgressHUD.dismiss()
+                            self.switchToTabBarController()
                         }
                     }
                 }
-
+                
             case .failure(let error):
                 print("❌ Ошибка получения токена: \(error)")
                 DispatchQueue.main.async {
-                    UIBlockingProgressHUD.dismiss() // ⬅️ Скрыть в случае ошибки
+                    print("⚠️ Показываем alert об ошибке авторизации")
+                    UIBlockingProgressHUD.dismiss()
                     self.showLoginErrorAlert()
                 }
             }
         }
     }
-
 }

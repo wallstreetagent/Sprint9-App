@@ -34,6 +34,7 @@ final class ProfileViewController: UIViewController {
                 return
             }
 
+            print("👉 fetchOAuthToken завершён, вызываем fetchProfile с токеном: \(token)")
             profileService.fetchProfile(token) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {

@@ -81,12 +81,14 @@ final class OAuth2Service {
                     let decoder = JSONDecoder()
                     let responseBody = try decoder.decode(OAuthTokenResponseBody.self, from: data)
                     self.tokenStorage.token = responseBody.accessToken
+                    print("✅ Токен успешно получен: \(responseBody.accessToken)")
                     completion(.success(responseBody.accessToken))
                 } catch {
                     completion(.failure(error))
                 }
                 
             case .failure(let error):
+                print("❌ Ошибка получения токена: \(error)")
                 completion(.failure(error))
             }
         }
