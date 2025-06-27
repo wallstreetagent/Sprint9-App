@@ -10,14 +10,14 @@ import Foundation
 final class ProfileImageService {
     static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
         
-    static let shared = ProfileImageService() // синглтон
-    private init() {} // приватный инициализатор
+    static let shared = ProfileImageService()
+    private init() {}
 
     private var task: URLSessionTask?
     private var lastUsername: String?
     private(set) var avatarURL: String?
 
-    // Структура для декодирования ответа
+  
     private struct UserResult: Codable {
         let profileImage: ProfileImage
 
@@ -30,9 +30,9 @@ final class ProfileImageService {
         }
     }
 
-    // Метод для получения URL аватарки
+   
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
-        // Предотвращаем гонку запросов: если запрашивается тот же username — игнорируем
+       
         if task != nil, username == lastUsername {
             return
         }

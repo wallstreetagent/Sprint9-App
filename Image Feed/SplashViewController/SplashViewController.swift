@@ -75,8 +75,19 @@ extension SplashViewController: AuthViewControllerDelegate {
             self.fetchOAuthToken(code)
         }
     }
+    
+    private func showLoginErrorAlert() {
+        let alert = UIAlertController(title: "Что-то пошло не так(",
+                                      message: "Не удалось войти в систему",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        self.present(alert, animated: true)
+    }
+
 
     private func fetchOAuthToken(_ code: String) {
+        UIBlockingProgressHUD.show() // ⬅️ Показываем HUD сразу
+
         oauth2Service.fetchOAuthToken(code) { [weak self] (result: Result<String, Error>) in
             guard let self = self else { return }
 
@@ -87,15 +98,26 @@ extension SplashViewController: AuthViewControllerDelegate {
                     case .success(let profile):
                         ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { _ in }
                         DispatchQueue.main.async {
+                            UIBlockingProgressHUD.dismiss() // ⬅️ Скрываем HUD
                             self.switchToTabBarController()
                         }
                     case .failure(let error):
                         print("❌ Не удалось загрузить профиль: \(error)")
+                        DispatchQueue.main.async {
+                            UIBlockingProgressHUD.dismiss() // ⬅️ Обязательно скрыть
+                            self.switchToTabBarController() // ⬅️ Переходим даже при ошибке
+                        }
                     }
                 }
+
             case .failure(let error):
                 print("❌ Ошибка получения токена: \(error)")
+                DispatchQueue.main.async {
+                    UIBlockingProgressHUD.dismiss() // ⬅️ Скрыть в случае ошибки
+                    self.showLoginErrorAlert()
+                }
             }
         }
     }
+
 }

@@ -28,7 +28,7 @@ final class OAuth2Service {
         var request = URLRequest(url: URL(string: "https://unsplash.com/oauth/token")!)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-
+        
         let parameters = [
             "client_id": Constants.accessKey,
             "client_secret": Constants.secretKey,
@@ -36,28 +36,28 @@ final class OAuth2Service {
             "code": code,
             "grant_type": "authorization_code"
         ]
-
+        
         let bodyString = parameters
             .map { "\($0.key)=\($0.value)" }
             .joined(separator: "&")
         request.httpBody = bodyString.data(using: .utf8)
-
+        
         return request
     }
-
+    
     func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         if let task = task {
             if lastCode == code {
-                completion(.failure(AuthServiceError.invalidRequest))
+                completion(.failure(NetworkError.invalidRequest))
                 return
             } else {
                 task.cancel()
             }
         } else {
             if lastCode == code {
-                completion(.failure(AuthServiceError.invalidRequest))
+                completion(.failure(NetworkError.invalidRequest))
                 return
             }
         }
@@ -65,16 +65,29 @@ final class OAuth2Service {
         lastCode = code
         
         guard let request = makeOAuthTokenRequest(code: code) else {
-            completion(.failure(AuthServiceError.invalidRequest))
+            completion(.failure(NetworkError.invalidRequest))
             return
         }
         
-        let urlSession = URLSession.shared
-        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                // обработка данных (ты сделаешь сама)
-                self?.task = nil
-                self?.lastCode = nil
+        let task = URLSession.shared.data(for: request) { [weak self] result in
+            guard let self = self else { return }
+            
+            self.task = nil
+            self.lastCode = nil
+            
+            switch result {
+            case .success(let data):
+                do {
+                    let decoder = JSONDecoder()
+                    let responseBody = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+                    self.tokenStorage.token = responseBody.accessToken
+                    completion(.success(responseBody.accessToken))
+                } catch {
+                    completion(.failure(error))
+                }
+                
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
         

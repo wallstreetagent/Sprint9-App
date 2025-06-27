@@ -37,6 +37,7 @@ final class WebViewViewController: UIViewController {
         }
 
         let request = URLRequest(url: url)
+        print("🔗 AUTH URL: \(url.absoluteString)")
         webView.load(request)
 
         updateProgress()
@@ -85,7 +86,7 @@ extension WebViewViewController: WKNavigationDelegate {
         decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
     ) {
         if let code = code(from: navigationAction) {
-            UIBlockingProgressHUD.show() // 👉 Показываем индикатор и блокируем UI
+            UIBlockingProgressHUD.show() 
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
             decisionHandler(.cancel)
         } else {
@@ -94,17 +95,16 @@ extension WebViewViewController: WKNavigationDelegate {
     }
 }
 
-    private func code(from navigationAction: WKNavigationAction) -> String? {
-        if
-            let url = navigationAction.request.url,
-            let urlComponents = URLComponents(string: url.absoluteString),
-            urlComponents.path == "/oauth/authorize/native",
-            let items = urlComponents.queryItems,
-            let codeItem = items.first(where: { $0.name == "code" })
-        {
-            return codeItem.value
-        } else {
-            return nil
-        }
+private func code(from navigationAction: WKNavigationAction) -> String? {
+    guard
+        let url = navigationAction.request.url,
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+        let queryItems = components.queryItems
+    else {
+        return nil
     }
+
+    return queryItems.first(where: { $0.name == "code" })?.value
+}
+
 

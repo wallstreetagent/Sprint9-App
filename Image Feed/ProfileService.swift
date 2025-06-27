@@ -93,7 +93,4 @@ final class ProfileService {
     }
 }
 
-enum NetworkError: Error {
-    case invalidRequest
-    case invalidResponse
-}
+
