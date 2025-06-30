@@ -275,7 +275,7 @@
         <!--Auth View Controller-->
         <scene sceneID="kf4-Te-i7L">
             <objects>
-                <viewController id="vec-fU-hlk" customClass="AuthViewController" customModule="Image_Feed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AuthViewController" id="vec-fU-hlk" customClass="AuthViewController" customModule="Image_Feed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="MMP-Zc-B95">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -397,7 +397,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sh9-yA-4Jv" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1139" y="-456"/>
+            <point key="canvasLocation" x="-1132" y="-450"/>
         </scene>
         <!--Unsplash-->
         <scene sceneID="Rud-ob-jE1">

@@ -7,6 +7,10 @@ protocol AuthViewControllerDelegate: AnyObject {
 final class AuthViewController: UIViewController {
     private let ShowWebViewSegueIdentifier = "ShowWebView"
     weak var delegate: AuthViewControllerDelegate?
+    func didSet() {
+        print(">> called")
+    }
+    
     private let oauth2Service = OAuth2Service.shared
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -31,6 +35,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
 
             switch result {
             case .success:
+                print("Отправляю делегату код в SplashViewController")
                 self.delegate?.authViewController(self, didAuthenticateWithCode: code)
             case .failure(let error):
                 print("Authorization error: \(error.localizedDescription)")
@@ -40,6 +45,9 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
 
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
+        print("✅ Токен успешно получен")
+            print("delegate в AuthViewController — nil? \(delegate == nil)")
+            print("Отправляю делегату код в SplashViewController")
         dismiss(animated: true)
     }
 }

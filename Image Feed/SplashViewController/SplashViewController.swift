@@ -2,7 +2,7 @@ import UIKit
 
 final class SplashViewController: UIViewController {
     private let profileService = ProfileService.shared
-    private let oauth2Service = OAuth2Service()
+    private let oauth2Service = OAuth2Service.shared
     private let oauth2TokenStorage = OAuth2TokenStorage()
 
     private let imageView: UIImageView = {
@@ -13,6 +13,7 @@ final class SplashViewController: UIViewController {
     }()
 
     override func viewDidLoad() {
+        print("📱 SplashViewController instance:", ObjectIdentifier(self))
         super.viewDidLoad()
         view.backgroundColor = .black
         setupLogo()
@@ -42,6 +43,7 @@ final class SplashViewController: UIViewController {
             fatalError("❌ Could not instantiate AuthViewController")
         }
         authVC.delegate = self
+        print("делегат установлен")
         authVC.modalPresentationStyle = .fullScreen
         present(authVC, animated: true)
     }
@@ -70,6 +72,7 @@ final class SplashViewController: UIViewController {
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
+        print("🌟 SplashViewController получил код от AuthViewController")
         dismiss(animated: true) { [weak self] in
             guard let self = self else { return }
             self.fetchOAuthToken(code)
@@ -108,7 +111,9 @@ extension SplashViewController: AuthViewControllerDelegate {
                         }
                         
                     case .failure(let error):
-                        print("❌ Не удалось загрузить профиль: \(error)")
+                        print("❌ Не удалось загрузить профиль: \(error.localizedDescription)")
+                        print("🧵 Ошибка: \(error)")
+
                         DispatchQueue.main.async {
                             print("➡️ Переход на TabBarController (ошибка профиля)")
                             UIBlockingProgressHUD.dismiss()
