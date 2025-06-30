@@ -38,7 +38,7 @@ final class OAuth2Service {
         ]
         
         let bodyString = parameters
-            .map { "\($0.key)=\($0.value)" }
+            .map { "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }
             .joined(separator: "&")
         request.httpBody = bodyString.data(using: .utf8)
         
