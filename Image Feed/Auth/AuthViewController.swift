@@ -7,9 +7,6 @@ protocol AuthViewControllerDelegate: AnyObject {
 final class AuthViewController: UIViewController {
     private let ShowWebViewSegueIdentifier = "ShowWebView"
     weak var delegate: AuthViewControllerDelegate?
-    func didSet() {
-        print(">> called")
-    }
     
     private let oauth2Service = OAuth2Service.shared
     
@@ -31,24 +28,23 @@ extension AuthViewController: WebViewViewControllerDelegate {
         print("Передан код \(code)")
         vc.dismiss(animated: true)
 
-                oauth2Service.fetchOAuthToken(code) { [weak self] result in
+        oauth2Service.fetchOAuthToken(code) { [weak self] result in
             guard let self = self else { return }
 
             switch result {
-           case .success:
-                print("Отправляю делегату код в SplashViewController")
-                self.delegate?.authViewController(self, didAuthenticateWithCode: code)
-           case .failure(let error):
-               print("Authorization error: \(error.localizedDescription)")
-                // Ошибка — остаёмся на AuthViewController
+            case .success(let token):
+                print("✅ Токен успешно получен: \(token)")
+                print("Отправляю делегату токен в SplashViewController")
+                self.delegate?.authViewController(self, didAuthenticateWithCode: token)
+
+            case .failure(let error):
+                print("❌ Ошибка авторизации: \(error.localizedDescription)")
             }
-       }
+        }
     }
 
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        print("✅ Токен успешно получен")
-            print("delegate в AuthViewController — nil? \(delegate == nil)")
-            print("Отправляю делегату код в SplashViewController")
+        print("❌ Пользователь отменил авторизацию")
         dismiss(animated: true)
     }
 }
