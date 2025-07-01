@@ -43,7 +43,7 @@ final class ProfileService {
     }
 
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
-        print("📡 fetchProfile вызван с токеном: \(token)") // ✅ Добавлено
+        print("📡 fetchProfile вызван с токеном: \(token)")
 
         task?.cancel()
 
@@ -91,10 +91,10 @@ final class ProfileService {
                 )
 
                 self?.profile = profile
-                print("✅ Профиль успешно получен: \(profile)") // ✅ Добавлено
+                print("✅ Профиль успешно получен: \(profile)")
                 completion(.success(profile))
             } catch {
-                print("❌ Ошибка декодирования профиля: \(error)") // ✅ Добавлено
+                print("❌ Ошибка декодирования профиля: \(error)") 
                 completion(.failure(error))
             }
         }
