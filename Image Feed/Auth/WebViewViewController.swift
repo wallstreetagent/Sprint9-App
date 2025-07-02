@@ -87,15 +87,18 @@ extension WebViewViewController: WKNavigationDelegate {
     ) {
         if let code = code(from: navigationAction) {
             print("Получен код \(code)")
-            UIBlockingProgressHUD.show()
-            print("Получен код авторизации: \(code)")
-            delegate?.webViewViewController(self, didAuthenticateWithCode: code)
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.show()
+                print("Получен код авторизации: \(code)")
+                self.delegate?.webViewViewController(self, didAuthenticateWithCode: code)
+            }
             decisionHandler(.cancel)
         } else {
             decisionHandler(.allow)
         }
     }
 }
+
 
 private func code(from navigationAction: WKNavigationAction) -> String? {
     guard

@@ -8,7 +8,7 @@ final class ProfileViewController: UIViewController {
     @IBOutlet private var descriptionLabel: UILabel!
     @IBOutlet private var logoutButton: UIButton!
  
-    private let profileService = ProfileService()
+    private let profileService = ProfileService.shared
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
             super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -29,7 +29,7 @@ final class ProfileViewController: UIViewController {
         override func viewDidLoad() {
             super.viewDidLoad()
             
-            guard let token = OAuth2TokenStorage().token else {
+            guard let token = OAuth2TokenStorage.shared.token else {
                 print("❌ Нет токена для запроса профиля")
                 return
             }
@@ -65,9 +65,9 @@ final class ProfileViewController: UIViewController {
         private func addObserver() {
             NotificationCenter.default.addObserver(
                 self,
-                selector: #selector(updateAvatar(notification:)),
-                name: ProfileImageService.didChangeNotification,
-                object: nil
+                selector: #selector(updateAvatar(_:)),
+                       name: ProfileImageService.didChangeNotification,
+                       object: nil
             )
         }
 
@@ -79,14 +79,16 @@ final class ProfileViewController: UIViewController {
             )
         }
 
-    @objc private func updateAvatar(notification: Notification) {
-        guard
-            isViewLoaded,
-            let userInfo = notification.userInfo,
-            let profileImageURL = userInfo["URL"] as? String,
-            let url = URL(string: profileImageURL)
-        else { return }
+    @objc private func updateAvatar(_ notification: Notification) {
+        DispatchQueue.main.async {
+            guard self.isViewLoaded else { return }
 
-        avatarImageView.kf.setImage(with: url)
+            if let profileImageURL = notification.userInfo?["URL"] as? String {
+                
+                self.avatarImageView.kf.setImage(with: URL(string: profileImageURL))
+            }
+        }
     }
+
+    
     }

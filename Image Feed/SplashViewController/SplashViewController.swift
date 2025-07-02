@@ -1,8 +1,11 @@
+
+// File name: SplashViewController
+
 import UIKit
 
 final class SplashViewController: UIViewController {
     private let profileService = ProfileService.shared
-    private let oauth2TokenStorage = OAuth2TokenStorage()
+    private let oauth2TokenStorage = OAuth2TokenStorage.shared
 
     private let imageView: UIImageView = {
         let imageView = UIImageView()
