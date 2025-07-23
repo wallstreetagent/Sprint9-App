@@ -28,6 +28,8 @@ final class ImagesListViewController: UIViewController {
     @objc private func updateTableViewAnimated() {
         let oldCount = photos.count
         let newCount = imagesListService.photos.count
+        print("✅ Обновление таблицы: oldCount = \(oldCount), newCount = \(newCount)")
+
         guard oldCount != newCount else { return }
 
         photos = imagesListService.photos
@@ -87,24 +89,20 @@ extension ImagesListViewController: UITableViewDataSource {
         }
 
         configCell(for: imageListCell, with: indexPath)
+        imageListCell.delegate = self 
         return imageListCell
     }
 }
 
 // MARK: - Cell Config
 extension ImagesListViewController {
-   
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let photo = photos[indexPath.row]
         let url = URL(string: photo.thumbImageURL)
 
-        // 🔄 Индикатор загрузки
         cell.cellImage.kf.indicatorType = .activity
-
-        // 🪧 Заглушка (замени "placeholder" на название своей картинки-заглушки из Assets)
         let placeholder = UIImage(named: "placeholder")
 
-        // ⬇️ Загрузка изображения с Kingfisher
         cell.cellImage.kf.setImage(
             with: url,
             placeholder: placeholder,
@@ -117,17 +115,11 @@ extension ImagesListViewController {
             }
         }
 
-        // 📅 Отображение даты
         let dateText = photo.createdAt.map { dateFormatter.string(from: $0) } ?? ""
         cell.dateLabel.text = dateText
 
-        // ❤️ Кнопка лайка
-        let likeImage = photo.isLiked
-            ? UIImage(named: "like_button_on")
-            : UIImage(named: "like_button_off")
-        cell.likeButton.setImage(likeImage, for: .normal)
+        cell.setIsLiked(photo.isLiked)
     }
-
 }
 
 // MARK: - UITableViewDelegate
@@ -135,13 +127,13 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: ShowSingleImageSegueIdentifier, sender: indexPath)
     }
-    
+
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-           if indexPath.row == photos.count - 1 {
-               imagesListService.fetchPhotosNextPage()
-           }
-       }
-    
+        if indexPath.row == photos.count - 1 {
+            imagesListService.fetchPhotosNextPage()
+        }
+    }
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let photo = photos[indexPath.row]
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
@@ -150,5 +142,42 @@ extension ImagesListViewController: UITableViewDelegate {
         let scale = imageViewWidth / imageWidth
         let cellHeight = photo.size.height * scale + imageInsets.top + imageInsets.bottom
         return cellHeight
+    }
+}
+
+// MARK: - ImagesListCellDelegate
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+
+        let photo = photos[indexPath.row]
+        let newIsLike = !photo.isLiked
+
+        UIBlockingProgressHUD.show()
+
+        imagesListService.changeLike(photoId: photo.id, isLike: newIsLike) { [weak self] result in
+            DispatchQueue.main.async {
+
+                UIBlockingProgressHUD.dismiss()
+
+                guard let self else { return }
+
+                switch result {
+                case .success:
+
+                    self.photos = self.imagesListService.photos
+                    cell.setIsLiked(self.photos[indexPath.row].isLiked)
+                case .failure(let error):
+                    print("❌ Ошибка лайка: \(error.localizedDescription)")
+                    let alert = UIAlertController(
+                        title: "Ошибка",
+                        message: "Не удалось поставить лайк. Попробуйте позже.",
+                        preferredStyle: .alert
+                    )
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                }
+            }
+        }
     }
 }

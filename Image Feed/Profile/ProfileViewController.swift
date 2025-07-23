@@ -7,6 +7,39 @@ final class ProfileViewController: UIViewController {
     @IBOutlet private var loginNameLabel: UILabel!
     @IBOutlet private var descriptionLabel: UILabel!
     @IBOutlet private var logoutButton: UIButton!
+    private var animationLayers = Set<CALayer>()
+
+    @IBAction private func didTapLogout(_ sender: UIButton) {
+        showLogoutAlert()
+    }
+
+    private func showLogoutAlert() {
+        let alert = UIAlertController(
+            title: "Пока-пока!",
+            message: "Are you sure you want to log out?",
+            preferredStyle: .alert
+        )
+
+        alert.addAction(UIAlertAction(title: "Нет", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Да", style: .destructive) { _ in
+            self.logout()
+        })
+
+        present(alert, animated: true)
+    }
+
+    
+    private func logout() {
+        OAuth2TokenStorage.shared.token = nil
+        ProfileLogoutService.shared.logout()
+
+        if let window = UIApplication.shared.windows.first {
+            let splashVC = SplashViewController()
+            window.rootViewController = splashVC
+            window.makeKeyAndVisible()
+        }
+    }
+
  
     private let profileService = ProfileService()
     
@@ -28,6 +61,7 @@ final class ProfileViewController: UIViewController {
 
         override func viewDidLoad() {
             super.viewDidLoad()
+            showLoadingGradient()
             
             guard let token = OAuth2TokenStorage().token else {
                 print("❌ Нет токена для запроса профиля")
@@ -80,6 +114,7 @@ final class ProfileViewController: UIViewController {
         }
 
     @objc private func updateAvatar(notification: Notification) {
+        removeLoadingGradients()
         guard
             isViewLoaded,
             let userInfo = notification.userInfo,
@@ -89,4 +124,46 @@ final class ProfileViewController: UIViewController {
 
         avatarImageView.kf.setImage(with: url)
     }
+    
+    private func makeAnimatedGradient(for view: UIView, cornerRadius: CGFloat = 0) -> CAGradientLayer {
+        let gradient = CAGradientLayer()
+        gradient.frame = view.bounds
+        gradient.locations = [0, 0.1, 0.3]
+        gradient.colors = [
+            UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
+            UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
+            UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
+        ]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.cornerRadius = cornerRadius
+        gradient.masksToBounds = true
+
+        let animation = CABasicAnimation(keyPath: "locations")
+        animation.fromValue = [0, 0.1, 0.3]
+        animation.toValue = [0, 0.8, 1]
+        animation.duration = 1.0
+        animation.repeatCount = .infinity
+        gradient.add(animation, forKey: "locationsChange")
+
+        animationLayers.insert(gradient)
+        return gradient
+    }
+    
+    private func showLoadingGradient() {
+        view.layoutIfNeeded() 
+        avatarImageView.layer.addSublayer(makeAnimatedGradient(for: avatarImageView, cornerRadius: 35))
+        nameLabel.layer.addSublayer(makeAnimatedGradient(for: nameLabel))
+        loginNameLabel.layer.addSublayer(makeAnimatedGradient(for: loginNameLabel))
+        descriptionLabel.layer.addSublayer(makeAnimatedGradient(for: descriptionLabel))
+    }
+    
+    private func removeLoadingGradients() {
+        for layer in animationLayers {
+            layer.removeAllAnimations()
+            layer.removeFromSuperlayer()
+        }
+        animationLayers.removeAll()
+    }
+    
     }
