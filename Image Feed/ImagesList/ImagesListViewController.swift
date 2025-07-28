@@ -55,6 +55,7 @@ final class ImagesListViewController: UIViewController {
             let imageData = url.flatMap { try? Data(contentsOf: $0) }
             let image = imageData.flatMap { UIImage(data: $0) }
             viewController.image = image
+
         } else {
             super.prepare(for: segue, sender: sender)
         }

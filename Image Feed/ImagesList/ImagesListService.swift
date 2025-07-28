@@ -36,7 +36,6 @@ final class ImagesListService {
         
         var request = URLRequest(url: url)
 
-        // ✅ Теперь используем токен авторизации OAuth
         guard let token = OAuth2TokenStorage.shared.token else {
             print("❌ Нет токена для запроса фото")
             isFetching = false
