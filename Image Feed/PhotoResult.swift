@@ -23,10 +23,6 @@ struct PhotoResult: Decodable {
     }
 }
 
-// struct PhotoResponse: Decodable {
- //   let results: [PhotoResult]
-// }
-
 struct UrlsResult: Decodable {
     let thumb: String
     let regular: String

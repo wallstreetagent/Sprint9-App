@@ -15,20 +15,26 @@ final class ProfileViewController: UIViewController {
 
     private func showLogoutAlert() {
         let alert = UIAlertController(
-            title: "Пока-пока!",
-            message: "Are you sure you want to log out?",
+            title: Strings.logoutTitle,
+            message: Strings.logoutMessage,
             preferredStyle: .alert
         )
 
-        alert.addAction(UIAlertAction(title: "Нет", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Да", style: .destructive) { _ in
+        alert.addAction(UIAlertAction(title: Strings.cancelButton, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: Strings.confirmButton, style: .destructive) { _ in
             self.logout()
         })
 
         present(alert, animated: true)
     }
 
-    
+    private enum Strings {
+        static let logoutTitle = "Пока-пока!"
+        static let logoutMessage = "Are you sure you want to log out?"
+        static let cancelButton = "Нет"
+        static let confirmButton = "Да"
+    }
+
     private func logout() {
         OAuth2TokenStorage.shared.token = nil
         ProfileLogoutService.shared.logout()
@@ -114,17 +120,21 @@ final class ProfileViewController: UIViewController {
         }
 
     @objc private func updateAvatar(notification: Notification) {
-        removeLoadingGradients()
-        guard
-            isViewLoaded,
-            let userInfo = notification.userInfo,
-            let profileImageURL = userInfo["URL"] as? String,
-            let url = URL(string: profileImageURL)
-        else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.removeLoadingGradients()
+            guard
+                self.isViewLoaded,
+                let userInfo = notification.userInfo,
+                let profileImageURL = userInfo["URL"] as? String,
+                let url = URL(string: profileImageURL)
+            else { return }
 
-        avatarImageView.kf.setImage(with: url)
+            self.avatarImageView.kf.setImage(with: url)
+        }
     }
-    
+
+
     private func makeAnimatedGradient(for view: UIView, cornerRadius: CGFloat = 0) -> CAGradientLayer {
         let gradient = CAGradientLayer()
         gradient.frame = view.bounds

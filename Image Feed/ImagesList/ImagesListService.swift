@@ -4,7 +4,6 @@
 //
 //  Created by Yanye Velikanova on 7/1/25.
 //
-
 import Foundation
 import UIKit
 
@@ -15,8 +14,9 @@ final class ImagesListService {
     private(set) var photos: [Photo] = []
     private var isFetching = false
     private var lastLoadedPage = 0
+    private let jsonDecoder = JSONDecoder()
     
-    private let dateFormatter: ISO8601DateFormatter = {
+    private lazy var dateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         return formatter
@@ -28,15 +28,29 @@ final class ImagesListService {
         
         let nextPage = lastLoadedPage + 1
         let urlString = "https://api.unsplash.com/photos?page=\(nextPage)"
-        var request = URLRequest(url: URL(string: urlString)!)
-        request.setValue("Client-ID \(Constants.accessKey)", forHTTPHeaderField: "Authorization")
+        
+        guard let url = URL(string: urlString) else {
+            isFetching = false
+            return
+        }
+        
+        var request = URLRequest(url: url)
+
+        // ✅ Теперь используем токен авторизации OAuth
+        guard let token = OAuth2TokenStorage.shared.token else {
+            print("❌ Нет токена для запроса фото")
+            isFetching = false
+            return
+        }
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             defer { self?.isFetching = false }
             guard let self = self, let data = data, error == nil else { return }
             
             do {
-                let results = try JSONDecoder().decode([PhotoResult].self, from: data)
+                print(String(data: data, encoding: .utf8) ?? "нет данных")
+                let results = try self.jsonDecoder.decode([PhotoResult].self, from: data)
                 
                 let newPhotos = results.map { result -> Photo in
                     let size = CGSize(width: result.width, height: result.height)
@@ -51,7 +65,6 @@ final class ImagesListService {
                         largeImageURL: result.urls.regular,
                         fullImageURL: result.urls.full,
                         isLiked: result.likedByUser
-                        
                     )
                 }
                 
@@ -62,6 +75,7 @@ final class ImagesListService {
                 }
             } catch {
                 print("Error decoding: \(error)")
+                print(String(data: data, encoding: .utf8) ?? "нет данных")
             }
         }
         
@@ -102,7 +116,7 @@ final class ImagesListService {
                         thumbImageURL: photo.thumbImageURL,
                         largeImageURL: photo.largeImageURL,
                         fullImageURL: photo.fullImageURL,
-                        isLiked: !photo.isLiked 
+                        isLiked: !photo.isLiked
                     )
                     self.photos[index] = newPhoto
                 }
@@ -119,5 +133,4 @@ final class ImagesListService {
         lastLoadedPage = 0
         isFetching = false
     }
-
 }
