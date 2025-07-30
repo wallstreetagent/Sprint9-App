@@ -82,6 +82,7 @@ final class ProfileViewController: UIViewController {
                         self?.nameLabel.text = profile.name
                         self?.loginNameLabel.text = profile.loginName
                         self?.descriptionLabel.text = profile.bio
+                        self?.removeLoadingGradients()
                     case .failure(let error):
                         print("❌ Ошибка загрузки профиля: \(error)")
                     }
