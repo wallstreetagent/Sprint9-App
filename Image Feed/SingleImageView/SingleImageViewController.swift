@@ -1,6 +1,7 @@
 import UIKit
 
 final class SingleImageViewController: UIViewController {
+    var fullImageURL: URL?
     var image: UIImage? {
         didSet {
             guard

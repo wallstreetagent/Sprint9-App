@@ -1,4 +1,8 @@
+
+// ImagesListViewController
+
 import UIKit
+import Kingfisher
 
 final class ImagesListViewController: UIViewController {
     private let ShowSingleImageSegueIdentifier = "ShowSingleImage"
@@ -7,6 +11,13 @@ final class ImagesListViewController: UIViewController {
 
     private let imagesListService = ImagesListService.shared
     private var photos: [Photo] = []
+
+    private lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +39,6 @@ final class ImagesListViewController: UIViewController {
     @objc private func updateTableViewAnimated() {
         let oldCount = photos.count
         let newCount = imagesListService.photos.count
-        print("✅ Обновление таблицы: oldCount = \(oldCount), newCount = \(newCount)")
 
         guard oldCount != newCount else { return }
 
@@ -55,21 +65,9 @@ final class ImagesListViewController: UIViewController {
             let imageData = url.flatMap { try? Data(contentsOf: $0) }
             let image = imageData.flatMap { UIImage(data: $0) }
             viewController.image = image
-
         } else {
             super.prepare(for: segue, sender: sender)
         }
-    }
-
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    }()
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -90,7 +88,7 @@ extension ImagesListViewController: UITableViewDataSource {
         }
 
         configCell(for: imageListCell, with: indexPath)
-        imageListCell.delegate = self 
+        imageListCell.delegate = self
         return imageListCell
     }
 }
@@ -118,7 +116,6 @@ extension ImagesListViewController {
 
         let dateText = photo.createdAt.map { dateFormatter.string(from: $0) } ?? ""
         cell.dateLabel.text = dateText
-
         cell.setIsLiked(photo.isLiked)
     }
 }
@@ -158,14 +155,11 @@ extension ImagesListViewController: ImagesListCellDelegate {
 
         imagesListService.changeLike(photoId: photo.id, isLike: newIsLike) { [weak self] result in
             DispatchQueue.main.async {
-
                 UIBlockingProgressHUD.dismiss()
-
                 guard let self else { return }
 
                 switch result {
                 case .success:
-
                     self.photos = self.imagesListService.photos
                     cell.setIsLiked(self.photos[indexPath.row].isLiked)
                 case .failure(let error):
