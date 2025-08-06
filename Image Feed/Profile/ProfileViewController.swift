@@ -31,7 +31,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     func updateProfile(name: String, login: String, bio: String?) {
         nameLabel.text = name
         loginNameLabel.text = login
-        descriptionLabel.text = bio
+        descriptionLabel.text = bio ?? ""
     }
 
     func updateAvatar(url: URL) {
