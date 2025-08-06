@@ -5,24 +5,23 @@
 //  Created by Yanye Velikanova on 8/6/25.
 //
 
-@testable import Image_Feed
+import Foundation
 import XCTest
+@testable import Image_Feed
 
 final class ImagesListViewControllerTests: XCTestCase {
-
-    func testTableViewExistsAndLoads() {
-
+    func testViewDidLoad_callsPresenter() {
+        // given
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let sut = storyboard.instantiateViewController(withIdentifier: "ImagesListViewController") as! ImagesListViewController
+        var presenter = ImagesListPresenterSpy()
 
+        sut.configure(presenter)
 
+        // when
         _ = sut.view
 
-
-        XCTAssertNotNil(sut.tableView, "Таблица должна существовать")
-
-
-        let rows = sut.tableView.numberOfRows(inSection: 0)
-        XCTAssertTrue(rows >= 0, "Количество строк должно быть неотрицательным")
+        // then
+        XCTAssertTrue(presenter.viewDidLoadCalled)
     }
 }

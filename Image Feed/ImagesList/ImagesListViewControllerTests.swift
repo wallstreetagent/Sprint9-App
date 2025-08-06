@@ -12,7 +12,7 @@ final class ImagesListViewControllerTests: XCTestCase {
     func testViewDidLoad_CallsPresenterViewDidLoad() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let sut = storyboard.instantiateViewController(withIdentifier: "ImagesListViewController") as! ImagesListViewController
-        let presenter = ImagesListPresenterSpy()
+        var presenter = ImagesListPresenterSpy()
         sut.configure(presenter)
         
         _ = sut.view // загружаем view

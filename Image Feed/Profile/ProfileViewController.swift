@@ -16,7 +16,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     @IBOutlet  var logoutButton: UIButton!
 
     private var animationLayers = Set<CALayer>()
-    private var presenter: ProfilePresenterProtocol!
+    var presenter: ProfilePresenterProtocol!
 
     func configure(_ presenter: ProfilePresenterProtocol) {
         self.presenter = presenter

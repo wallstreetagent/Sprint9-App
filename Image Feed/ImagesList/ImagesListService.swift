@@ -4,6 +4,8 @@
 //
 //  Created by Yanye Velikanova on 7/1/25.
 //
+
+
 import Foundation
 import UIKit
 
@@ -35,95 +37,84 @@ final class ImagesListService {
         }
         
         var request = URLRequest(url: url)
-
         guard let token = OAuth2TokenStorage.shared.token else {
-            print("❌ Нет токена для запроса фото")
             isFetching = false
             return
         }
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            defer { self?.isFetching = false }
-            guard let self = self, let data = data, error == nil else { return }
+        let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
+            guard let self, let data, error == nil else {
+                self?.isFetching = false
+                return
+            }
             
             do {
-                print(String(data: data, encoding: .utf8) ?? "нет данных")
                 let results = try self.jsonDecoder.decode([PhotoResult].self, from: data)
-                
-                let newPhotos = results.map { result -> Photo in
-                    let size = CGSize(width: result.width, height: result.height)
-                    let date = result.createdAt.flatMap { self.dateFormatter.date(from: $0) }
-                    
-                    return Photo(
-                        id: result.id,
-                        size: size,
-                        createdAt: date,
-                        welcomeDescription: result.description,
-                        thumbImageURL: result.urls.thumb,
-                        largeImageURL: result.urls.regular,
-                        fullImageURL: result.urls.full,
-                        isLiked: result.likedByUser
+                let newPhotos = results.map {
+                    Photo(
+                        id: $0.id,
+                        size: CGSize(width: $0.width, height: $0.height),
+                        createdAt: $0.createdAt.flatMap { self.dateFormatter.date(from: $0) },
+                        welcomeDescription: $0.description,
+                        thumbImageURL: $0.urls.thumb,
+                        largeImageURL: $0.urls.regular,
+                        fullImageURL: $0.urls.full,
+                        isLiked: $0.likedByUser
                     )
                 }
                 
                 DispatchQueue.main.async {
                     self.photos.append(contentsOf: newPhotos)
                     self.lastLoadedPage = nextPage
+                    self.isFetching = false
                     NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
                 }
             } catch {
-                print("Error decoding: \(error)")
-                print(String(data: data, encoding: .utf8) ?? "нет данных")
+                self.isFetching = false
+                print("Decoding error: \(error)")
             }
         }
         
         task.resume()
     }
-    
-    func changeLike(photoId: String, isLike: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+
+    func changeLike(photoId: String, isLike: Bool, completion: @escaping (Result<Photo, Error>) -> Void) {
         guard let token = OAuth2TokenStorage.shared.token else {
             completion(.failure(NSError(domain: "No token", code: 401)))
             return
         }
-        
+
         let urlString = "https://api.unsplash.com/photos/\(photoId)/like"
         guard let url = URL(string: urlString) else {
             completion(.failure(NSError(domain: "Invalid URL", code: 400)))
             return
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = isLike ? "POST" : "DELETE"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+
+        let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
+            guard let self else { return }
+
             if let error = error {
                 completion(.failure(error))
                 return
             }
-            
+
             DispatchQueue.main.async {
-                guard let self else { return }
                 if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
-                    let photo = self.photos[index]
-                    let newPhoto = Photo(
-                        id: photo.id,
-                        size: photo.size,
-                        createdAt: photo.createdAt,
-                        welcomeDescription: photo.welcomeDescription,
-                        thumbImageURL: photo.thumbImageURL,
-                        largeImageURL: photo.largeImageURL,
-                        fullImageURL: photo.fullImageURL,
-                        isLiked: !photo.isLiked
-                    )
-                    self.photos[index] = newPhoto
+                    var photo = self.photos[index]
+                    photo.isLiked = isLike
+                    self.photos[index] = photo
+                    completion(.success(photo))
+                } else {
+                    completion(.failure(NSError(domain: "Photo not found", code: 404)))
                 }
-                
-                completion(.success(()))
             }
         }
-        
+
         task.resume()
     }
     
