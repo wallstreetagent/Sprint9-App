@@ -9,11 +9,11 @@ protocol ProfileViewControllerProtocol: AnyObject {
 }
 
 final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
-    @IBOutlet private var avatarImageView: UIImageView!
-    @IBOutlet private var nameLabel: UILabel!
-    @IBOutlet private var loginNameLabel: UILabel!
-    @IBOutlet private var descriptionLabel: UILabel!
-    @IBOutlet private var logoutButton: UIButton!
+    @IBOutlet  var avatarImageView: UIImageView!
+    @IBOutlet  var nameLabel: UILabel!
+    @IBOutlet  var loginNameLabel: UILabel!
+    @IBOutlet  var descriptionLabel: UILabel!
+    @IBOutlet  var logoutButton: UIButton!
 
     private var animationLayers = Set<CALayer>()
     private var presenter: ProfilePresenterProtocol!
