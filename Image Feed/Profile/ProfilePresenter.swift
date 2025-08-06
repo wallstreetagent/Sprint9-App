@@ -54,6 +54,11 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         OAuth2TokenStorage.shared.token = nil
         ProfileLogoutService.shared.logout()
 
+
+        if ProcessInfo.processInfo.arguments.contains("--uitesting") {
+            return
+        }
+
         if let window = UIApplication.shared.windows.first {
             let splashVC = SplashViewController()
             window.rootViewController = splashVC

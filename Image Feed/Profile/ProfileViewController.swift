@@ -50,7 +50,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         presenter.logoutTapped()
     }
 
-    // MARK: - Градиенты (твой код)
+    // MARK:
     private func makeAnimatedGradient(for view: UIView, cornerRadius: CGFloat = 0) -> CAGradientLayer {
         let gradient = CAGradientLayer()
         gradient.frame = view.bounds

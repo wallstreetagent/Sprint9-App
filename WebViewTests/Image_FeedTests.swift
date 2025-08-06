@@ -71,7 +71,7 @@ final class WebViewTests: XCTestCase {
         let authHelper = AuthHelper(configuration: configuration)
         
         // when
-        let url = authHelper.authRequest().url! // можно и authURL() если ты его добавишь
+        let url = authHelper.authRequest().url! 
         let urlString = url.absoluteString
         
         // then

@@ -25,7 +25,7 @@ final class WebViewPresenter: WebViewPresenterProtocol {
     func viewDidLoad() {
         let request = authHelper.authRequest()
         view?.load(request: request)
-        didUpdateProgressValue(0) // сразу показываем прогресс
+        didUpdateProgressValue(0) 
     }
 
     func didUpdateProgressValue(_ newValue: Double) {

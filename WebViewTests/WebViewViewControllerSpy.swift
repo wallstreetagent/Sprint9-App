@@ -17,10 +17,10 @@ final class WebViewViewControllerSpy: WebViewViewControllerProtocol {
     }
 
     func setProgressValue(_ newValue: Float) {
-        // не нужен для этого теста
+
     }
 
     func setProgressHidden(_ isHidden: Bool) {
-        // не нужен для этого теста
+
     }
 }

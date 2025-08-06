@@ -7,7 +7,7 @@ import Kingfisher
 final class ImagesListViewController: UIViewController {
     private let ShowSingleImageSegueIdentifier = "ShowSingleImage"
 
-    @IBOutlet private var tableView: UITableView!
+    @IBOutlet var tableView: UITableView!
 
     private let imagesListService = ImagesListService.shared
     private var photos: [Photo] = []
@@ -36,7 +36,7 @@ final class ImagesListViewController: UIViewController {
         imagesListService.fetchPhotosNextPage()
     }
 
-    @objc private func updateTableViewAnimated() {
+    @objc func updateTableViewAnimated() {
         let oldCount = photos.count
         let newCount = imagesListService.photos.count
 
