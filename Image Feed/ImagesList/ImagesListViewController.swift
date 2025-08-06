@@ -1,7 +1,10 @@
+//
+//  ImagesListViewController.swift
+//  Image Feed
+//
+//  Created by Yanye Velikanova on 8/6/25.
+//
 
-// ImagesListViewController
-
-import Foundation
 import UIKit
 import Kingfisher
 
@@ -17,10 +20,9 @@ final class ImagesListViewController: UIViewController {
         return formatter
     }()
 
-     var presenter: ImagesListPresenterProtocol!
+    var presenter: ImagesListPresenterProtocol!
 
     func configure(_ presenter: ImagesListPresenterProtocol) {
-        print("✅ configure called!")
         self.presenter = presenter
         presenter.view = self
     }
@@ -54,7 +56,6 @@ final class ImagesListViewController: UIViewController {
     }
 }
 
-// MARK: - UITableViewDataSource
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         presenter.photoCount()
@@ -76,7 +77,6 @@ extension ImagesListViewController: UITableViewDataSource {
     }
 }
 
-// MARK: - Cell Config
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let photo = presenter.photo(at: indexPath.row)
@@ -103,7 +103,6 @@ extension ImagesListViewController {
     }
 }
 
-// MARK: - UITableViewDelegate
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: ShowSingleImageSegueIdentifier, sender: indexPath)
@@ -111,7 +110,7 @@ extension ImagesListViewController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == presenter.photoCount() - 1 {
-            presenter.viewDidLoad() // можно сделать отдельный метод `fetchNextPage()`
+            presenter.viewDidLoad()
         }
     }
 
@@ -126,7 +125,6 @@ extension ImagesListViewController: UITableViewDelegate {
     }
 }
 
-// MARK: - ImagesListCellDelegate
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
@@ -134,7 +132,6 @@ extension ImagesListViewController: ImagesListCellDelegate {
     }
 }
 
-// MARK: - ImagesListViewControllerProtocol
 extension ImagesListViewController: ImagesListViewControllerProtocol {
     func updateTableAnimated(oldCount: Int, newCount: Int) {
         tableView.performBatchUpdates {
@@ -154,6 +151,6 @@ extension ImagesListViewController: ImagesListViewControllerProtocol {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
-        self.present(alert, animated: true)
+        present(alert, animated: true)
     }
 }

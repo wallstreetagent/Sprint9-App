@@ -5,12 +5,11 @@
 //  Created by Yanye Velikanova on 8/6/25.
 //
 
-
 import Foundation
 
 final class ImagesListPresenter: ImagesListPresenterProtocol {
     weak var view: ImagesListViewControllerProtocol?
-    
+
     private let imagesListService = ImagesListService.shared
     private var photos: [Photo] = []
 
