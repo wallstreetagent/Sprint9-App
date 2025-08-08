@@ -64,7 +64,7 @@ final class Image_FeedUITests: XCTestCase {
             let emailTextField = webView.textFields.element
             XCTAssertTrue(emailTextField.waitForExistence(timeout: 5))
             emailTextField.tap()
-            emailTextField.typeText("Enter_your_email_here")
+            emailTextField.typeText("designlabbrooklyn@gmail.com")
 
             let dismissKeyboardCoord = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2))
             dismissKeyboardCoord.tap()
@@ -72,7 +72,7 @@ final class Image_FeedUITests: XCTestCase {
             let passwordField = webView.secureTextFields.element
             XCTAssertTrue(passwordField.waitForExistence(timeout: 5))
             passwordField.tap()
-            passwordField.typeText("Enter_your_password_here") // \n = нажатие "Enter"
+            passwordField.typeText("753159nnNN123!") // \n = нажатие "Enter"
             passwordField.typeText("\n")
         }
 
