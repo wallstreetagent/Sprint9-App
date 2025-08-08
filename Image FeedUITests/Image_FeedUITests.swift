@@ -53,9 +53,9 @@ final class Image_FeedUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        // 1. Авторизация
+        // Авторизация (если требуется)
         let authButton = app.buttons["Authenticate"]
-        if authButton.exists {
+        if authButton.waitForExistence(timeout: 3) {
             authButton.tap()
 
             let webView = app.webViews["UnsplashWebView"]
@@ -64,35 +64,58 @@ final class Image_FeedUITests: XCTestCase {
             let emailTextField = webView.textFields.element
             XCTAssertTrue(emailTextField.waitForExistence(timeout: 5))
             emailTextField.tap()
-            emailTextField.typeText("demo@demo.com")
+            emailTextField.typeText("designlabbrooklyn@gmail.com")
 
-            // Тапнуть вне поля email, чтобы скрыть клавиатуру
-            let coordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2))
-            coordinate.tap()
+            let dismissKeyboardCoord = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.2))
+            dismissKeyboardCoord.tap()
 
-            let passwordSecureField = webView.secureTextFields.element
-            XCTAssertTrue(passwordSecureField.waitForExistence(timeout: 5))
-            passwordSecureField.tap()
-            passwordSecureField.typeText("password123")
-            passwordSecureField.typeText("\n")
+            let passwordField = webView.secureTextFields.element
+            XCTAssertTrue(passwordField.waitForExistence(timeout: 5))
+            passwordField.tap()
+            passwordField.typeText("753159nnNN123!") // \n = нажатие "Enter"
+            passwordField.typeText("\n")
         }
 
-        // 2. Таблица
+        // 1. Подождать, пока открывается и загружается экран ленты
         let table = app.tables.firstMatch
         XCTAssertTrue(table.waitForExistence(timeout: 10))
 
-        // 3. Прокрутка и поиск ячейки
+        // 2. Сделать жест «смахивания» вверх по экрану
         table.swipeUp()
-        table.swipeDown()
+        table.swipeDown() // ← для надёжности, чтобы верхние ячейки появились
 
-        let cell = table.cells["ImagesListCell"].firstMatch
-        XCTAssertTrue(cell.waitForExistence(timeout: 10))
-        cell.tap() // можно опционально
+        // 3. Поставить лайк в ячейке верхней картинки
+        let firstCell = table.cells.element(boundBy: 0)
+        while !firstCell.isHittable {
+            table.swipeDown()
+        }
 
-        // 4. Проверка на наличие кнопки Like
-        let likeButton = cell.buttons["likeButton"] // укажи точный identifier, если есть
-        XCTAssertTrue(likeButton.exists)
+        let likeButton = firstCell.buttons["likeButton"]
+        XCTAssertTrue(likeButton.waitForExistence(timeout: 5))
+
+        likeButton.tap() // 3. лайк
+        likeButton.tap() // 4. отмена лайка
+
+        // 5. Нажать на верхнюю ячейку
+        firstCell.tap()
+
+        // 6. Подождать, пока картинка открывается на весь экран
+        let image = app.scrollViews.images.firstMatch
+        XCTAssertTrue(image.waitForExistence(timeout: 5))
+
+        // 7. Увеличить картинку
+        image.pinch(withScale: 3, velocity: 1)
+
+        // 8. Уменьшить картинку
+        image.pinch(withScale: 0.5, velocity: -1)
+
+        // 9. Вернуться на экран ленты
+        let backButton = app.buttons["Back"]
+        XCTAssertTrue(backButton.waitForExistence(timeout: 5))
+        backButton.tap()
     }
+
+
 
 
 
