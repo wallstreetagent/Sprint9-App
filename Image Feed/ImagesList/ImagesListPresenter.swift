@@ -14,6 +14,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     private var photos: [Photo] = []
 
     func viewDidLoad() {
+        print("🎬 Presenter viewDidLoad called")
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(didChangePhotos),
@@ -24,8 +25,11 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     }
 
     @objc private func didChangePhotos() {
+        print("📸 Photos loaded: \(photos.count)")
+        print("photos count:", photos.count)
         let oldCount = photos.count
         photos = imagesListService.photos
+        print("✅ Photos loaded: \(photos.count)")
         view?.updateTableAnimated(oldCount: oldCount, newCount: photos.count)
     }
 

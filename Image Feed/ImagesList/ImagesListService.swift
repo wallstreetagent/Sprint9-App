@@ -25,32 +25,51 @@ final class ImagesListService {
     }()
     
     func fetchPhotosNextPage() {
-        guard !isFetching else { return }
+        guard !isFetching else {
+            print("⏳ Already fetching")
+            return
+        }
         isFetching = true
-        
+
         let nextPage = lastLoadedPage + 1
         let urlString = "https://api.unsplash.com/photos?page=\(nextPage)"
-        
+        print("🌐 Fetching from URL:", urlString)
+
         guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL")
             isFetching = false
             return
         }
-        
+
         var request = URLRequest(url: url)
         guard let token = OAuth2TokenStorage.shared.token else {
+            print("❌ No token")
             isFetching = false
             return
         }
+
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
-            guard let self, let data, error == nil else {
-                self?.isFetching = false
+        print("🔐 Token set, starting request...")
+
+        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self else { return }
+
+            if let error = error {
+                print("❌ Request error:", error)
+                self.isFetching = false
                 return
             }
-            
+
+            guard let data else {
+                print("❌ No data received")
+                self.isFetching = false
+                return
+            }
+
             do {
                 let results = try self.jsonDecoder.decode([PhotoResult].self, from: data)
+                print("✅ Decoded photos count:", results.count)
+                
                 let newPhotos = results.map {
                     Photo(
                         id: $0.id,
@@ -63,21 +82,24 @@ final class ImagesListService {
                         isLiked: $0.likedByUser
                     )
                 }
-                
+
                 DispatchQueue.main.async {
                     self.photos.append(contentsOf: newPhotos)
                     self.lastLoadedPage = nextPage
                     self.isFetching = false
+                    print("📸 Photos updated: \(self.photos.count)")
                     NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
                 }
+
             } catch {
+                print("❌ Decoding error:", error)
                 self.isFetching = false
-                print("Decoding error: \(error)")
             }
         }
-        
+
         task.resume()
     }
+
 
     func changeLike(photoId: String, isLike: Bool, completion: @escaping (Result<Photo, Error>) -> Void) {
         guard let token = OAuth2TokenStorage.shared.token else {
