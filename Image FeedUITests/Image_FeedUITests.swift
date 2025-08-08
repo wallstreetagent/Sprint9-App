@@ -29,7 +29,7 @@ final class Image_FeedUITests: XCTestCase {
         let emailTextField = webView.textFields.element
         XCTAssertTrue(emailTextField.waitForExistence(timeout: 5))
         emailTextField.tap()
-        emailTextField.typeText("designlabbrooklyn@gmail.com")
+        emailTextField.typeText("******")
 
         // 4. Скроллим вниз (имитация свайпа вверх, чтобы появилось поле пароля)
         let start = webView.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.8))
@@ -41,7 +41,7 @@ final class Image_FeedUITests: XCTestCase {
         XCTAssertTrue(passwordField.waitForExistence(timeout: 5))
         let passwordCoordinate = passwordField.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         passwordCoordinate.tap()
-        passwordField.typeText("753159nnNN123!") // \n = нажатие "Enter"
+        passwordField.typeText("********") // \n = нажатие "Enter"
         passwordField.typeText("\n")
 
         // 6. Проверяем, что появился список фото
