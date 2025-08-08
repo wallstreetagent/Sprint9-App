@@ -22,10 +22,8 @@
 		60457AFD2DF78A4B0078682E /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 60457AFC2DF78A4B0078682E /* SwiftKeychainWrapper */; };
 		606EBEC62E44031A005090B4 /* ImagesListViewControllerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606EBEC52E440318005090B4 /* ImagesListViewControllerProtocol.swift */; };
 		606EBEC82E44036E005090B4 /* ImagesListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606EBEC72E44036C005090B4 /* ImagesListPresenter.swift */; };
-		606EBEE22E440691005090B4 /* ImagesListPresenterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606EBEC42E4402AF005090B4 /* ImagesListPresenterProtocol.swift */; };
 		606EBEE32E440699005090B4 /* ImagesListPresenterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606EBEC42E4402AF005090B4 /* ImagesListPresenterProtocol.swift */; };
 		607296022E43B87700B9BE31 /* ProfilePresenterSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EA38C02E4343EE00C1DFA4 /* ProfilePresenterSpy.swift */; };
-		6075EA692E44159D00D3F432 /* ImagesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6075EA682E44159A00D3F432 /* ImagesListViewController.swift */; };
 		6075EA6A2E4415B100D3F432 /* ImagesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6075EA682E44159A00D3F432 /* ImagesListViewController.swift */; };
 		6095FD9F2DEA5C25007A3BEE /* ProfileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6095FD9E2DEA5C21007A3BEE /* ProfileImageService.swift */; };
 		6099B0C12E457D1400086BAB /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6099B0C02E457D1300086BAB /* TabBarController.swift */; };
@@ -557,9 +555,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6075EA692E44159D00D3F432 /* ImagesListViewController.swift in Sources */,
 				607296022E43B87700B9BE31 /* ProfilePresenterSpy.swift in Sources */,
-				606EBEE22E440691005090B4 /* ImagesListPresenterProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
