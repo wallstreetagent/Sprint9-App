@@ -15,45 +15,34 @@ protocol ProfilePresenterProtocol: AnyObject {
 
 final class ProfilePresenter: ProfilePresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
-    private let profileService = ProfileService()
+    private let profileService = ProfileService.shared
+    private let tokenStorage = OAuth2TokenStorage.shared
 
     func viewDidLoad() {
         view?.showLoadingState()
 
-        guard let token = OAuth2TokenStorage().token else {
-            print("❌ Нет токена для запроса профиля")
+        guard let profile = profileService.profile else {
+            view?.hideLoadingState()
             return
         }
 
-        print("👉 fetchOAuthToken завершён, вызываем fetchProfile с токеном: \(token)")
-        profileService.fetchProfile(token) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let profile):
-                    self?.view?.updateProfile(
-                        name: profile.name,
-                        login: profile.loginName,
-                        bio: profile.bio
-                    )
+        view?.updateProfile(
+            name: profile.name,
+            login: profile.loginName,
+            bio: profile.bio
+        )
 
-                    if let avatarURL = ProfileImageService.shared.avatarURL,
-                       let url = URL(string: avatarURL) {
-                        self?.view?.updateAvatar(url: url)
-                    }
-
-                    self?.view?.hideLoadingState()
-
-                case .failure(let error):
-                    print("❌ Ошибка загрузки профиля: \(error)")
-                }
-            }
+        if let avatarURL = ProfileImageService.shared.avatarURL,
+           let url = URL(string: avatarURL) {
+            view?.updateAvatar(url: url)
         }
+
+        view?.hideLoadingState()
     }
 
     func logoutTapped() {
-        OAuth2TokenStorage.shared.token = nil
+        tokenStorage.token = nil
         ProfileLogoutService.shared.logout()
-
 
         if ProcessInfo.processInfo.arguments.contains("--uitesting") {
             return

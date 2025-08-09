@@ -1,3 +1,7 @@
+
+
+
+
 import UIKit
 import WebKit
 
@@ -12,34 +16,26 @@ protocol WebViewViewControllerProtocol: AnyObject {
     func setProgressHidden(_ isHidden: Bool)
 }
 
-final class WebViewViewController: UIViewController & WebViewViewControllerProtocol {
-    // MARK: - Public
+final class WebViewViewController: UIViewController, WebViewViewControllerProtocol {
     var presenter: WebViewPresenterProtocol?
     weak var delegate: WebViewViewControllerDelegate?
 
-    // MARK: - Outlets
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
 
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         webView.accessibilityIdentifier = "UnsplashWebView"
         webView.navigationDelegate = self
         presenter?.viewDidLoad()
-
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil
-        )
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
     }
 
-    override func observeValue(forKeyPath keyPath: String?,
-                               of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?,
-                               context: UnsafeMutableRawPointer?) {
+    deinit {
+        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == #keyPath(WKWebView.estimatedProgress) {
             presenter?.didUpdateProgressValue(webView.estimatedProgress)
         } else {
@@ -47,12 +43,14 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
         }
     }
 
-    // MARK: - Actions
     @IBAction private func didTapCancel(_ sender: Any) {
         delegate?.webViewViewControllerDidCancel(self)
     }
 
-    // MARK: - WebViewViewControllerProtocol
+    @IBAction private func didTapBackButton(_ sender: Any) {
+        delegate?.webViewViewControllerDidCancel(self)
+    }
+
     func load(request: URLRequest) {
         webView.load(request)
     }
@@ -66,13 +64,9 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     }
 }
 
-// MARK: - WKNavigationDelegate
 extension WebViewViewController: WKNavigationDelegate {
-    func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let url = navigationAction.request.url,
-           let code = presenter?.code(from: url) {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if let url = navigationAction.request.url, let code = presenter?.code(from: url) {
             delegate?.webViewViewController(self, didAuthenticateWithCode: code)
             decisionHandler(.cancel)
         } else {

@@ -9,15 +9,15 @@ import Foundation
 
 final class ProfileImageService {
     static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
-        
     static let shared = ProfileImageService()
     private init() {}
+
+    private let tokenStorage = OAuth2TokenStorage.shared
 
     private var task: URLSessionTask?
     private var lastUsername: String?
     private(set) var avatarURL: String?
 
-  
     private struct UserResult: Codable {
         let profileImage: ProfileImage
 
@@ -30,9 +30,7 @@ final class ProfileImageService {
         }
     }
 
-   
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
-       
         if task != nil, username == lastUsername {
             return
         }
@@ -48,7 +46,7 @@ final class ProfileImageService {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
 
-        if let token = OAuth2TokenStorage().token {
+        if let token = tokenStorage.token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         } else {
             completion(.failure(NetworkError.invalidRequest))
@@ -84,24 +82,23 @@ final class ProfileImageService {
                 let urlString = result.profileImage.small
                 self?.avatarURL = urlString
                 completion(.success(urlString))
-                
+
                 NotificationCenter.default.post(
-                        name: ProfileImageService.didChangeNotification,
-                        object: self,
-                        userInfo: ["URL": urlString]
-                    )
-                } catch {
-                    completion(.failure(error))
-                }
+                    name: ProfileImageService.didChangeNotification,
+                    object: self,
+                    userInfo: ["URL": urlString]
+                )
+            } catch {
+                completion(.failure(error))
+            }
         }
 
         task?.resume()
     }
+
     func reset() {
         avatarURL = nil
         task?.cancel()
         task = nil
     }
-
 }
-

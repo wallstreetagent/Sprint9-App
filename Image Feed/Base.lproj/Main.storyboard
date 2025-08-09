@@ -171,6 +171,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="Rop-UD-BDX"/>
                     <connections>
+                        <outlet property="backButton" destination="Xaa-Zz-Lw0" id="Ped-rW-RVA"/>
                         <outlet property="imageView" destination="ZBo-oy-VFV" id="h5k-md-ii4"/>
                         <outlet property="scrollView" destination="mC2-Di-bFm" id="0a6-qC-Yr1"/>
                     </connections>

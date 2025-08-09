@@ -13,7 +13,7 @@ final class ProfileLogoutService {
     private init() { }
 
     func logout() {
-        OAuth2TokenStorage.shared.removeToken()
+        OAuth2TokenStorage.shared.clear()
 
         cleanCookies()
 

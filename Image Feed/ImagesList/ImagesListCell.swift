@@ -12,8 +12,14 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var likeButton: UIButton!
     
+    
     weak var delegate: ImagesListCellDelegate?
 
+    override func awakeFromNib() {
+            super.awakeFromNib()
+            likeButton.accessibilityIdentifier = "likeButton"
+        }
+    
     override func prepareForReuse() {
             super.prepareForReuse()
             cellImage.kf.cancelDownloadTask()
